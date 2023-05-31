@@ -11,8 +11,7 @@ Backend приложения:
   - `npm run start` — запускает сервер
   - `npm run dev` — запускает сервер с hot-reload
 
----
 ## Ссылки:
-Просмотреть проект можно по ссылке на GitHub: https://github.com/Viki-B90/movies-explorer-api
-Публичный IP-адрес сервера: 51.250.5.125
-Backend приложения: https://api.movies.viki.b.nomoredomains.rocks
+- Просмотреть проект можно по ссылке на GitHub: https://github.com/Viki-B90/movies-explorer-api
+- Публичный IP-адрес сервера: 51.250.9.68
+- Backend приложения: https://api.movies.viki.b.nomoredomains.rocks
