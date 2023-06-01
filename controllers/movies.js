@@ -26,7 +26,7 @@ module.exports.postMovie = (req, res, next) => {
     .then((movie) => res.status(statusCode.CREATED).send(movie))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        next(new BadRequestError(messages.errorsMessages.invalidMovieData));
+        next(new BadRequestError({ message: messages.errorsMessages.invalidMovieData }));
       } else {
         next(error);
       }
@@ -34,19 +34,16 @@ module.exports.postMovie = (req, res, next) => {
 };
 
 module.exports.deleteMovie = (req, res, next) => {
-  const { movieId } = req.params;
-  const owner = req.user.payload;
-
-  Movie.findById(movieId)
+  Movie.findById(req.params.movieId)
     .then((movie) => {
       if (!movie) {
-        return next(new NotFoundError(messages.errorsMessages.notfoundMovie));
+        return next(new NotFoundError({ message: messages.errorsMessages.notfoundMovie }));
       }
-      if (String(movie.owner) !== owner) {
-        return next(new ForbiddenError(messages.errorsMessages.forbiddenMovieDelete));
+      if (movie.owner.toString() !== req.user.payload.toString()) {
+        return next(new ForbiddenError({ message: messages.errorsMessages.forbiddenMovieDelete }));
       }
-      return Movie.findByIdAndRemove(movieId)
-        .then(() => res.send(messages.successMessages.movieDeleteSuccess))
+      return movie.remove()
+        .then(() => res.send({ message: messages.successMessages.movieDeleteSuccess }))
         .catch(next);
     })
     .catch(next);

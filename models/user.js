@@ -7,43 +7,44 @@ const messages = require('../utils/messages');
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: [true, 'Необходима электронная почта.'],
+    required: [true, messages.errorsMessages.emailRequired],
     unique: true,
     validate: {
       validator: (email) => validator.isEmail(email),
-      message: 'Указана неверная почта.',
+      message: messages.errorsMessages.invalidEmail,
     },
   },
   password: {
     type: String,
-    required: [true, 'Необходим пароль.'],
+    required: [true, messages.errorsMessages.passwordRequired],
     select: false,
   },
   name: {
     type: String,
-    required: [true, 'Не указано имя.'],
-    minlength: [2, 'Имя не должно быть короче 2-х символов.'],
-    maxlength: [30, 'Имя не должно быть длиннее 30-и символов.'],
+    required: [true, messages.errorsMessages.userNameRequired],
+    minlength: [2, messages.errorsMessages.userNameLength],
+    maxlength: [30, messages.errorsMessages.userNameLength],
   },
-}, { versionKey: false });
-
-// eslint-disable-next-line func-names
-userSchema.statics.findUserByCredentials = function (email, password) {
-  return this.findOne({ email })
-    .select('+password')
-    .then((user) => {
-      if (!user) {
-        throw new UnauthError(messages.errorsMessages.wrongAuth);
-      }
-
-      return bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
+}, {
+  versionKey: false,
+  statics: {
+    findUserByCredentials(email, password) {
+      return this.findOne({ email }).select('+password')
+        .then((user) => {
+          if (!user) {
             throw new UnauthError(messages.errorsMessages.wrongAuth);
           }
-          return user;
+
+          return bcrypt.compare(password, user.password)
+            .then((matched) => {
+              if (!matched) {
+                throw new UnauthError(messages.errorsMessages.wrongAuth);
+              }
+              return user;
+            });
         });
-    });
-};
+    },
+  },
+});
 
 module.exports = mongoose.model('user', userSchema);

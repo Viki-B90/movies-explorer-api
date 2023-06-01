@@ -12,23 +12,21 @@ const {
 
 const routesUsers = require('./users');
 const routesMovies = require('./movies');
+const routesLogout = require('./logout');
 
 const {
   createUser,
   login,
-  logout,
 } = require('../controllers/users');
 
 router.post('/signup', validateUserCreate, createUser);
 router.post('/signin', validateUserAuth, login);
-router.get('/signout', logout);
 
-router.use(auth);
+router.use('/users', auth, routesUsers);
+router.use('/movies', auth, routesMovies);
+router.use('/signout', auth, routesLogout);
 
-router.use('/users', routesUsers);
-router.use('/movies', routesMovies);
-
-router.use((req, res, next) => {
+router.use('*', auth, (req, res, next) => {
   next(new NotFoundError(messages.errorsMessages.pageNotFound));
 });
 

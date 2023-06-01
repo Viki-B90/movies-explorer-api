@@ -6,7 +6,6 @@ const statusCode = require('../utils/statusCode');
 const {
   BadRequestError,
   ConflictError,
-  UnauthError,
 } = require('../errors/index-errors');
 
 const messages = require('../utils/messages');
@@ -30,13 +29,12 @@ module.exports.createUser = (req, res, next) => {
         .then((user) => res.status(statusCode.CREATED).send({
           email: user.email,
           name: user.name,
-          password: user.password,
         }))
         .catch((error) => {
           if (error.name === 'MongoServerError' || error.code === 11000) {
-            next(new ConflictError(messages.errorsMessages.emailConflict));
+            next(new ConflictError({ message: messages.errorsMessages.emailConflict }));
           } else if (error.name === 'ValidationError') {
-            next(new BadRequestError(messages.errorsMessages.invalidUserData));
+            next(new BadRequestError({ message: messages.errorsMessages.invalidUserData }));
           } else {
             next(error);
           }
@@ -58,15 +56,13 @@ module.exports.login = (req, res, next) => {
           sameSite: 'none',
           secure: true,
         })
-        .send(messages.successMessages.authSuccess);
+        .send({ token });
     })
-    .catch(() => {
-      next(new UnauthError(messages.errorsMessages.wrongAuth));
-    });
+    .catch(next);
 };
 
 module.exports.logout = (req, res) => {
-  res.clearCookie('jwt').send(messages.successMessages.logoutSuccess);
+  res.clearCookie('jwt').send({ message: messages.successMessages.logoutSuccess });
 };
 
 module.exports.getUser = (req, res, next) => {
@@ -95,9 +91,9 @@ module.exports.updateUser = (req, res, next) => {
     }))
     .catch((error) => {
       if (error.name === 'MongoServerError' || error.code === 11000) {
-        next(new ConflictError(messages.errorsMessages.emailConflict));
+        next(new ConflictError({ message: messages.errorsMessages.emailConflict }));
       } else if (error.name === 'ValidationError') {
-        next(new BadRequestError(messages.errorsMessages.invalidUserData));
+        next(new BadRequestError({ message: messages.errorsMessages.invalidUserId }));
       } else {
         next(error);
       }
