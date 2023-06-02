@@ -32,9 +32,9 @@ module.exports.createUser = (req, res, next) => {
         }))
         .catch((error) => {
           if (error.name === 'MongoServerError' || error.code === 11000) {
-            next(new ConflictError({ message: messages.errorsMessages.emailConflict }));
+            next(new ConflictError(messages.errorsMessages.emailConflict));
           } else if (error.name === 'ValidationError') {
-            next(new BadRequestError({ message: messages.errorsMessages.invalidUserData }));
+            next(new BadRequestError(messages.errorsMessages.invalidData));
           } else {
             next(error);
           }
@@ -67,10 +67,7 @@ module.exports.logout = (req, res) => {
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user.payload)
-    .then((user) => res.send({
-      email: user.email,
-      name: user.name,
-    }))
+    .then((user) => res.send(user))
     .catch(next);
 };
 
@@ -85,15 +82,12 @@ module.exports.updateUser = (req, res, next) => {
       upsert: false,
     },
   )
-    .then((user) => res.send({
-      email: user.email,
-      name: user.name,
-    }))
+    .then((user) => res.send(user))
     .catch((error) => {
       if (error.name === 'MongoServerError' || error.code === 11000) {
-        next(new ConflictError({ message: messages.errorsMessages.emailConflict }));
+        next(new ConflictError(messages.errorsMessages.emailConflict));
       } else if (error.name === 'ValidationError') {
-        next(new BadRequestError({ message: messages.errorsMessages.invalidUserId }));
+        next(new BadRequestError(messages.errorsMessages.invalidData));
       } else {
         next(error);
       }

@@ -4,41 +4,41 @@ const validator = require('validator');
 const movieSchema = new mongoose.Schema({
   country: {
     type: String,
-    required: [true, 'Страна создания фильма должна быть указана.'],
+    required: true,
   },
   director: {
     type: String,
-    required: [true, 'Режиссер фильма должен быть указан.'],
+    required: true,
   },
   duration: {
     type: Number,
-    required: [true, 'Продолжительность фильма должна быть указана.'],
+    required: true,
   },
   year: {
     type: String,
-    required: [true, 'Год создания фильма должен быть указан.'],
+    required: true,
   },
   description: {
     type: String,
-    required: [true, 'Описание фильма должно быть обязательно указано.'],
+    required: true,
   },
   image: {
     type: String,
-    required: [true, 'Ссылка на постер к фильму должна быть обязательна'],
+    required: true,
     validate: {
       validator: (link) => validator.isURL(link),
     },
   },
   trailerLink: {
     type: String,
-    required: [true, 'Ссылка на трейлер фильма должна быть обязательна'],
+    required: true,
     validate: {
       validator: (link) => validator.isURL(link),
     },
   },
   thumbnail: {
     type: String,
-    required: [true, 'Ссылка на мини-постер к фильму должна быть обязательна'],
+    required: true,
     validate: {
       validator: (link) => validator.isURL(link),
     },
@@ -50,15 +50,15 @@ const movieSchema = new mongoose.Schema({
   },
   movieId: {
     type: Number,
-    required: [true, 'id фильма должен быть обязательно указан.'],
+    required: true,
   },
   nameRU: {
     type: String,
-    required: [true, 'Название фильма на русском должно быть обязательно.'],
+    required: true,
   },
   nameEN: {
     type: String,
-    required: [true, 'Название фильма на английском должно быть обязательно.'],
+    required: true,
   },
 }, { versionKey: false });
 

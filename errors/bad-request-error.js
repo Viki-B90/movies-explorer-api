@@ -1,7 +1,6 @@
 class BadRequestError extends Error {
-  constructor(message = 'Некорректный запрос.') {
+  constructor(message) {
     super(message);
-    this.message = (`400 Bad Request — ${message}`);
     this.statusCode = 400;
   }
 }

@@ -7,7 +7,7 @@ const messages = require('../utils/messages');
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: [true, messages.errorsMessages.emailRequired],
+    required: true,
     unique: true,
     validate: {
       validator: (email) => validator.isEmail(email),
@@ -16,14 +16,14 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, messages.errorsMessages.passwordRequired],
+    required: true,
     select: false,
   },
   name: {
     type: String,
-    required: [true, messages.errorsMessages.userNameRequired],
-    minlength: [2, messages.errorsMessages.userNameLength],
-    maxlength: [30, messages.errorsMessages.userNameLength],
+    required: true,
+    minlength: 2,
+    maxlength: 30,
   },
 }, {
   versionKey: false,
