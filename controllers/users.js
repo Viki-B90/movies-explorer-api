@@ -67,7 +67,10 @@ module.exports.logout = (req, res) => {
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user.payload)
-    .then((user) => res.send(user))
+    .then((user) => res.send({
+      email: user.email,
+      name: user.name,
+    }))
     .catch(next);
 };
 
@@ -82,7 +85,10 @@ module.exports.updateUser = (req, res, next) => {
       upsert: false,
     },
   )
-    .then((user) => res.send(user))
+    .then((user) => res.send({
+      email: user.email,
+      name: user.name,
+    }))
     .catch((error) => {
       if (error.name === 'MongoServerError' || error.code === 11000) {
         next(new ConflictError(messages.errorsMessages.emailConflict));
