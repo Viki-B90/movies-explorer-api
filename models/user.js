@@ -25,26 +25,23 @@ const userSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 30,
   },
-}, {
-  versionKey: false,
-  statics: {
-    findUserByCredentials(email, password) {
-      return this.findOne({ email }).select('+password')
-        .then((user) => {
-          if (!user) {
+}, { versionKey: false });
+
+userSchema.statics.findUserByCredentials = function (email, password) {
+  return this.findOne({ email })
+    .select('+password')
+    .then((user) => {
+      if (!user) {
+        throw new UnauthError(messages.errorsMessages.wrongAuth);
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
             throw new UnauthError(messages.errorsMessages.wrongAuth);
           }
-
-          return bcrypt.compare(password, user.password)
-            .then((matched) => {
-              if (!matched) {
-                throw new UnauthError(messages.errorsMessages.wrongAuth);
-              }
-              return user;
-            });
+          return user;
         });
-    },
-  },
-});
+    });
+};
 
 module.exports = mongoose.model('user', userSchema);
