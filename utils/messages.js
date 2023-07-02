@@ -12,7 +12,9 @@ const errorsMessages = {
   wrongAuth: 'Неправильные почта или пароль пользователя.',
   authRequired: 'Необходима авторизация.',
   wrongToken: 'Неправильный токен. Необходима авторизация.',
+  invalidUrl: 'Невалидный URL',
   invalidData: 'Переданы некорректные данные.',
+  invalidUserId: 'Пользователь с таким id не найден.',
   notfoundMovie: 'Фильм не найден.',
   forbiddenMovieDelete: 'Нельзя удалять чужие фильмы.',
 };

@@ -1,93 +1,99 @@
 const bcrypt = require('bcryptjs');
-const User = require('../models/user');
-const getJwtToken = require('../utils/jwt');
+const jwt = require('jsonwebtoken');
+const { user } = require('../models/user');
 const statusCode = require('../utils/statusCode');
 
 const {
   BadRequestError,
   ConflictError,
+  NotFoundError,
+  UnauthError,
 } = require('../errors/index-errors');
 
 const messages = require('../utils/messages');
 
-const SALT_ROUNDS = require('../utils/config');
+const { NODE_ENV, JWT_SECRET } = process.env;
 
-module.exports.createUser = (req, res, next) => {
+exports.createUser = async (req, res, next) => {
   const {
-    email,
-    password,
-    name,
+    name, email, password,
   } = req.body;
-
-  bcrypt.hash(password, Number(SALT_ROUNDS))
-    .then((hash) => {
-      User.create({
-        email,
-        password: hash,
-        name,
-      })
-        .then((user) => res.status(statusCode.CREATED).send({
-          email: user.email,
-          name: user.name,
-        }))
-        .catch((error) => {
-          if (error.name === 'MongoServerError' || error.code === 11000) {
-            next(new ConflictError(messages.errorsMessages.emailConflict));
-          } else if (error.name === 'ValidationError') {
-            next(new BadRequestError(messages.errorsMessages.invalidData));
-          } else {
-            next(error);
-          }
-        });
-    })
-    .catch(next);
+  const hash = await bcrypt.hash(password, 10);
+  user.create({
+    name, email, password: hash,
+  })
+    .then((users) => res.status(statusCode.CREATED).send({
+      name: users.name,
+      email: users.email,
+      _id: users._id,
+    }))
+    .catch((error) => {
+      if (error.name === 'MongoServerError' || error.code === 11000) {
+        next(new ConflictError(messages.errorsMessages.emailConflict));
+      } else if (error.name === 'ValidationError') {
+        next(new BadRequestError(messages.errorsMessages.invalidData));
+      } else {
+        next(error);
+      }
+    });
 };
 
-module.exports.login = (req, res, next) => {
+exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = getJwtToken(user._id);
-      res
-        .cookie('jwt', token, {
-          maxage: 3600000 * 24 * 7,
-          httpOnly: true,
-          sameSite: 'none',
-          secure: true,
-        })
-        .send({ token });
+  return user.findUserByCredentials(email, password)
+    .then((users) => {
+      const token = jwt.sign(
+        { _id: users._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'test-secret-word',
+        { expiresIn: '7d' },
+      );
+
+      res.send({ token });
     })
-    .catch(next);
+    .catch(() => {
+      next(new UnauthError(messages.errorsMessages.wrongAuth));
+    });
 };
 
-module.exports.logout = (req, res) => {
+exports.logout = (req, res) => {
   res.clearCookie('jwt').send({ message: messages.successMessages.logoutSuccess });
 };
 
-module.exports.getUser = (req, res, next) => {
-  User.findById(req.user.payload)
-    .then((user) => res.send({
-      email: user.email,
-      name: user.name,
-    }))
-    .catch(next);
+exports.getUser = (req, res, next) => {
+  user.findOne({ _id: req.user._id })
+    .then((users) => {
+      if (users) {
+        res.send({
+          name: users.name,
+          email: users.email,
+          _id: users._id,
+        });
+      } next(new NotFoundError(messages.errorsMessages.invalidUserId));
+    })
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        next(new BadRequestError(messages.errorsMessages.invalidData));
+      } else {
+        next(error);
+      }
+    });
 };
 
-module.exports.updateUser = (req, res, next) => {
-  const { email, name } = req.body;
-  User.findByIdAndUpdate(
-    req.user.payload,
-    { email, name },
+exports.updateUser = (req, res, next) => {
+  const { name, email } = req.body;
+  user.findOneAndUpdate(
+    { _id: req.user._id },
+    { name, email },
     {
       new: true,
       runValidators: true,
-      upsert: false,
     },
   )
-    .then((user) => res.send({
-      email: user.email,
-      name: user.name,
+    .then((users) => res.send({
+      _id: users._id,
+      email: users.email,
+      name: users.name,
     }))
     .catch((error) => {
       if (error.name === 'MongoServerError' || error.code === 11000) {

@@ -1,4 +1,4 @@
-const routesUsers = require('express').Router();
+const userRoutes = require('express').Router();
 
 const {
   getUser,
@@ -9,7 +9,7 @@ const {
   validateUpdateUser,
 } = require('../middlewares/validators');
 
-routesUsers.get('/me', getUser);
-routesUsers.patch('/me', validateUpdateUser, updateUser);
+userRoutes.get('/users/me', getUser);
+userRoutes.patch('/users/me', validateUpdateUser, updateUser);
 
-module.exports = routesUsers;
+exports.userRoutes = userRoutes;

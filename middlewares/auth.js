@@ -1,26 +1,26 @@
 const jwt = require('jsonwebtoken');
 const { UnauthError } = require('../errors/index-errors');
 
-const { NODE_ENV, JWT_SECRET } = require('../utils/config');
-
+const { NODE_ENV, JWT_SECRET } = process.env;
 const messages = require('../utils/messages');
 
-module.exports = (req, res, next) => {
-  const token = req.cookies.jwt;
+exports.auth = (req, res, next) => {
+  const { authorization } = req.headers;
 
-  if (!token) {
-    throw new UnauthError(messages.errorsMessages.authRequired);
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    return next(new UnauthError(messages.errorsMessages.authRequired));
   }
 
+  const token = authorization.replace('Bearer ', '');
   let payload;
 
   try {
-    payload = jwt.verify(token, NODE_ENV !== 'production' ? 'test-secret-word' : JWT_SECRET);
-  } catch (err) {
-    throw new UnauthError(messages.errorsMessages.wrongToken);
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'test-secret-word');
+  } catch (error) {
+    return next(new UnauthError(messages.errorsMessages.wrongToken));
   }
 
   req.user = payload;
 
-  next();
+  return next();
 };

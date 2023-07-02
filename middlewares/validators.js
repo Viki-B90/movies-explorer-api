@@ -1,96 +1,95 @@
 const { celebrate, Joi } = require('celebrate');
-const { urlRegExp } = require('../utils/regexp');
+const validator = require('validator');
 
-module.exports.validateUserCreate = celebrate({
+const validateUserCreate = celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email().messages({
-      'any.required': 'Почта должна быть заполнена обязательно',
-      'string.email': 'Указана некорректная почта.',
+    email: Joi.string().required().custom((value, helpers) => {
+      if (validator.isEmail(value)) {
+        return value;
+      }
+      return helpers.message('Невалидный email!');
+    }).message({
+      'any.required': 'Поле "email" должно быть заполнено',
     }),
-    password: Joi.string().required().messages({
-      'any.required': 'Требуется пароль.',
-    }),
-    name: Joi.string().min(2).max(30).required()
-      .messages({
-        'any.required': 'Поле Имя должно быть обязательно заполнено',
-        'string.min': 'Имя должно содержать от 2-х символов',
-        'string.max': 'Имя должно содержать до 30-и символов',
-      }),
+    password: Joi.string().required(),
+    name: Joi.string().min(2).max(30).required(),
   }),
 });
 
-module.exports.validateUserAuth = celebrate({
+const validateUserAuth = celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email().messages({
-      'any.required': 'Почта должна быть заполнена обязательно',
-      'string.email': 'Указана некорректная почта.',
+    email: Joi.string().required().custom((value, helpers) => {
+      if (validator.isEmail(value)) {
+        return value;
+      }
+      return helpers.message('Невалидный email!');
+    }).message({
+      'any.required': 'Поле "email" должно быть заполнено',
     }),
-    password: Joi.string().required().messages({
-      'any.required': 'Требуется пароль.',
-    }),
+    password: Joi.string().required(),
   }),
 });
 
-module.exports.validateUpdateUser = celebrate({
+const validateUpdateUser = celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email()
-      .messages({
-        'string.email': 'Указана некорректная почта.',
-      }),
-    name: Joi.string().min(2).max(30).required()
-      .messages({
-        'any.required': 'Поле Имя должно быть обязательно заполнено',
-        'string.min': 'Имя должно содержать от 2-х символов',
-        'string.max': 'Имя должно содержать до 30-и символов',
-      }),
+    email: Joi.string().custom((value, helpers) => {
+      if (validator.isEmail(value)) {
+        return value;
+      }
+      return helpers.message('Невалидный email!');
+    }).message({
+      'any.required': 'Поле "email" должно быть заполнено',
+    }),
+    name: Joi.string().min(2).max(30),
   }),
 });
 
-module.exports.validateMoviePost = celebrate({
-  body: Joi.object().keys({
-    country: Joi.string().required().messages({
-      'any.required': 'Поле должно быть заполнено',
-    }),
-    director: Joi.string().required().messages({
-      'any.required': 'Поле должно быть заполнено',
-    }),
-    duration: Joi.number().integer().required().messages({
-      'any.required': 'Поле должно быть заполнено',
-      'number.base': 'Значение должно быть числом.',
-    }),
-    year: Joi.string().required().length(4).messages({
-      'any.required': 'Поле должно быть заполнено',
-      'string.length': 'Поле должно содержать 4 цифры.',
-    }),
-    description: Joi.string().required().messages({
-      'any.required': 'Поле должно быть заполнено',
-    }),
-    image: Joi.string().required().regex(urlRegExp).messages({
-      'any.required': 'Поле должно быть заполнено',
-      'string.pattern.base': 'Некорректная ссылка',
-    }),
-    trailerLink: Joi.string().required().regex(urlRegExp).messages({
-      'any.required': 'Поле должно быть заполнено',
-      'string.pattern.base': 'Некорректная ссылка',
-    }),
-    thumbnail: Joi.string().required().regex(urlRegExp).messages({
-      'any.required': 'Поле должно быть заполнено',
-      'string.pattern.base': 'Некорректная ссылка',
-    }),
-    movieId: Joi.number().integer().required().messages({
-      'any.required': 'Поле должно быть заполнено',
-    }),
-    nameRU: Joi.string().required().messages({
-      'any.required': 'Поле должно быть заполнено',
-    }),
-    nameEN: Joi.string().required().messages({
-      'any.required': 'Поле должно быть заполнено',
-    }),
-  }),
-});
-
-module.exports.validateMovieId = celebrate({
+const validateDeleteMovie = celebrate({
   params: Joi.object().keys({
-    movieId: Joi.string().required().hex().length(24),
+    _id: Joi.string().required(),
   }),
 });
+
+const validateMovieCreate = celebrate({
+  body: Joi.object().keys({
+    country: Joi.string().allow(null).allow('').required(),
+    director: Joi.string().required(),
+    duration: Joi.number().required(),
+    year: Joi.string().required(),
+    description: Joi.string().required(),
+    image: Joi.required().custom((value, helpers) => {
+      if (validator.isURL(value)) {
+        return value;
+      }
+      return helpers.message('Невалидный URL!');
+    }).message({
+      'any.required': 'Поле "image" должно быть заполнено',
+    }),
+    trailerLink: Joi.string().required().custom((value, helpers) => {
+      if (validator.isURL(value)) {
+        return value;
+      }
+      return helpers.message('Невалидный URL!');
+    }).message({
+      'any.required': 'Поле "trailerLink" должно быть заполнено',
+    }),
+    nameRU: Joi.string().required(),
+    nameEN: Joi.string().required().allow(null).allow(''),
+    thumbnail: Joi.string().allow(null).allow('').custom((value, helpers) => {
+      if (validator.isURL(value)) {
+        return value;
+      }
+      return helpers.message('Невалидный URL!');
+    }),
+    id: Joi.number().required(),
+    liked: Joi.boolean().required(),
+  }),
+});
+
+module.exports = {
+  validateMovieCreate,
+  validateDeleteMovie,
+  validateUserCreate,
+  validateUserAuth,
+  validateUpdateUser,
+};

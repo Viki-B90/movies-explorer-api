@@ -4,6 +4,7 @@ const corsOrigins = {
     'http://api.movies.viki.b.nomoredomains.rocks',
     'https://movies.viki.b.nomoredomains.rocks',
     'http://movies.viki.b.nomoredomains.rocks',
+    'https://api.nomoreparties.co/beatfilm-movies',
     'http://localhost:3000',
     'http://locahost:3001',
   ],

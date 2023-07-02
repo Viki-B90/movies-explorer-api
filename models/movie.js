@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const messages = require('../utils/messages');
 
 const movieSchema = new mongoose.Schema({
   country: {
     type: String,
-    required: true,
+    required: false,
   },
   director: {
     type: String,
@@ -23,34 +24,20 @@ const movieSchema = new mongoose.Schema({
     required: true,
   },
   image: {
-    type: String,
+    type: String || null,
     required: true,
     validate: {
-      validator: (link) => validator.isURL(link),
+      validator: (value) => validator.isURL(value),
+      message: messages.errorsMessages.invalidUrl,
     },
   },
   trailerLink: {
     type: String,
     required: true,
     validate: {
-      validator: (link) => validator.isURL(link),
+      validator: (value) => validator.isURL(value),
+      message: messages.errorsMessages.invalidUrl,
     },
-  },
-  thumbnail: {
-    type: String,
-    required: true,
-    validate: {
-      validator: (link) => validator.isURL(link),
-    },
-  },
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
-    required: true,
-  },
-  movieId: {
-    type: Number,
-    required: true,
   },
   nameRU: {
     type: String,
@@ -58,8 +45,29 @@ const movieSchema = new mongoose.Schema({
   },
   nameEN: {
     type: String,
+    required: false,
+  },
+  thumbnail: {
+    type: String,
+    required: false,
+    validate: {
+      validator: (value) => validator.isURL(value),
+      message: messages.errorsMessages.invalidUrl,
+    },
+  },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
     required: true,
   },
-}, { versionKey: false });
+  id: {
+    type: Number,
+    required: true,
+  },
+  liked: {
+    type: Boolean,
+    required: true,
+  },
+});
 
-module.exports = mongoose.model('movie', movieSchema);
+exports.movie = mongoose.model('movie', movieSchema);

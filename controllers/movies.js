@@ -1,4 +1,4 @@
-const Movie = require('../models/movie');
+const { movie } = require('../models/movie');
 const statusCode = require('../utils/statusCode')
 
 const {
@@ -9,45 +9,87 @@ const {
 
 const messages = require('../utils/messages');
 
-module.exports.getMovies = (req, res, next) => {
-  const owner = req.user.payload;
-
-  Movie.find({ owner })
-    .then((movies) => {
-      res.status(statusCode.CREATED).send(movies);
-    })
+exports.getMovies = (req, res, next) => {
+  movie.find({})
+    .then((movies) => res.status(statusCode.CREATED).send(movies))
     .catch(next);
 };
 
-module.exports.postMovie = (req, res, next) => {
-  const owner = req.user.payload;
-
-  Movie.create({ owner, ...req.body })
-    .then((movie) => res.status(statusCode.CREATED).send(movie))
-    .catch((error) => {
-      if (error.name === 'ValidationError') {
+exports.createMovie = (req, res, next) => {
+  const {
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    nameRU,
+    nameEN,
+    thumbnail,
+    id,
+    liked,
+  } = req.body;
+  const ownerId = req.user._id;
+  const moviesId = req.params._id;
+  movie.create({
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    nameRU,
+    nameEN,
+    thumbnail,
+    owner: ownerId,
+    id,
+    _id: moviesId,
+    liked,
+  })
+    .then((movies) => {
+      res.send({
+        country: movies.country,
+        director: movies.director,
+        duration: movies.duration,
+        year: movies.year,
+        description: movies.description,
+        image: movies.image,
+        trailerLink: movies.trailerLink,
+        nameRU: movies.nameRU,
+        nameEN: movies.nameEN,
+        thumbnail: movies.thumbnail,
+        owner: movies.owner,
+        id: movies.id,
+        _id: movies._id,
+        liked: movies.liked,
+      });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
         next(new BadRequestError(messages.errorsMessages.invalidData));
       } else {
-        next(error);
+        next(err);
       }
     });
 };
 
-module.exports.deleteMovie = (req, res, next) => {
-  const { movieId } = req.params;
-  const owner = req.user.payload;
-
-  Movie.findById(movieId)
-    .then((movie) => {
-      if (!movie) {
-        return next(new NotFoundError(messages.errorsMessages.notfoundMovie));
-      }
-      if (String(movie.owner) !== owner) {
-        return next(new ForbiddenError(messages.errorsMessages.forbiddenMovieDelete));
-      }
-      return Movie.findByIdAndRemove(movieId)
-        .then(() => res.send({ message: messages.successMessages.movieDeleteSuccess }))
-        .catch(next);
+exports.deleteMovie = (req, res, next) => {
+  movie.findById(req.params._id)
+    .then((data) => {
+      if (data) {
+        if (data.owner.equals(req.user._id)) {
+          return data.deleteOne({})
+            .then(() => res.send({ message: messages.successMessages.movieDeleteSuccess }));
+        } next(new ForbiddenError(messages.errorsMessages.forbiddenMovieDelete));
+      } return next(new NotFoundError(messages.errorsMessages.notfoundMovie));
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError(messages.errorsMessages.invalidData));
+      } else {
+        next(err);
+      }
+    });
 };
