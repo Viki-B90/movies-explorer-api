@@ -8,7 +8,7 @@ const corsUrl = {
     'http://localhost:3000',
     'http://locahost:3001',
   ],
-  credentials: true,
+  credentials: 'include',
 };
 
 function corsOrigins(req, res, next) {
