@@ -1,15 +1,12 @@
-const corsUrl = {
-  origin: [
-    'https://api.movies.viki.b.nomoredomains.rocks',
-    'http://api.movies.viki.b.nomoredomains.rocks',
-    'https://movies.viki.b.nomoredomains.rocks',
-    'http://movies.viki.b.nomoredomains.rocks',
-    'https://api.nomoreparties.co/beatfilm-movies',
-    'http://localhost:3000',
-    'http://locahost:3001',
-  ],
-  credentials: 'include',
-};
+const corsUrl = [
+  'https://api.movies.viki.b.nomoredomains.rocks',
+  'http://api.movies.viki.b.nomoredomains.rocks',
+  'https://movies.viki.b.nomoredomains.rocks',
+  'http://movies.viki.b.nomoredomains.rocks',
+  'https://api.nomoreparties.co/beatfilm-movies',
+  'http://localhost:3000',
+  'http://locahost:3001',
+];
 
 function corsOrigins(req, res, next) {
   const { origin } = req.headers;
