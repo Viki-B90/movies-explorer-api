@@ -1,4 +1,4 @@
-const corsUrl = [
+const allowedCors = [
   'https://api.movies.viki.b.nomoredomains.rocks',
   'http://api.movies.viki.b.nomoredomains.rocks',
   'https://movies.viki.b.nomoredomains.rocks',
@@ -13,8 +13,8 @@ function corsOrigins(req, res, next) {
   const { method } = req;
   const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
   const reqHeaders = req.headers['access-control-request-headers'];
-  if (corsUrl.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Credentials', true);
   }
   if (method === 'OPTIONS') {

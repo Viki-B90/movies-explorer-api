@@ -39,7 +39,7 @@ app.use(auth);
 app.use('/', userRoutes);
 app.use('/', movieRoutes);
 
-app.use((req, res, next) => {
+app.use('*', (req, res, next) => {
   next(new NotFoundError(messages.errorsMessages.pageNotFound));
 });
 
