@@ -48,14 +48,14 @@ exports.login = (req, res, next) => {
         NODE_ENV === 'production' ? JWT_SECRET : 'test-secret-word',
         { expiresIn: '7d' },
       );
-      // res
-      //   .cookie('jwt', token, {
-      //     maxage: 3600000 * 24 * 7,
-      //     httpOnly: true,
-      //     sameSite: true,
-      //     // secure: true,
-      //   })
-      res.send({ token });
+      res
+        .cookie('jwt', token, {
+          maxage: 3600000 * 24 * 7,
+          httpOnly: true,
+          sameSite: 'none',
+          secure: true,
+        })
+        .send({ token });
     })
     .catch(() => {
       next(new UnauthError(messages.errorsMessages.wrongAuth));

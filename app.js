@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
-const cors = require('cors');
+// const cors = require('cors');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -12,7 +12,7 @@ const { movieRoutes } = require('./routes/movies');
 const { signRoutes } = require('./routes/sign');
 const { auth } = require('./middlewares/auth');
 const { handleErrors } = require('./middlewares/handleErrors');
-const allowedCors = require('./utils/cors-origins');
+const corsOrigins = require('./utils/cors-origins');
 const { NotFoundError } = require('./errors/index-errors');
 const messages = require('./utils/messages');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(requestLogger);
 app.use(helmet());
 app.use(rateLimiter);
-app.use(cors(allowedCors));
+app.use(corsOrigins);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -39,7 +39,7 @@ app.use(auth);
 app.use('/', userRoutes);
 app.use('/', movieRoutes);
 
-app.use('*', (req, res, next) => {
+app.use((req, res, next) => {
   next(new NotFoundError(messages.errorsMessages.pageNotFound));
 });
 

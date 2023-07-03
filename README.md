@@ -13,5 +13,5 @@ Backend приложения:
 
 ## Ссылки:
 - Просмотреть проект можно по ссылке на GitHub: https://github.com/Viki-B90/movies-explorer-api
-- Публичный IP-адрес сервера: 51.250.9.68
+- Публичный IP-адрес сервера: 62.84.126.82
 - Backend приложения: https://api.movies.viki.b.nomoredomains.rocks
