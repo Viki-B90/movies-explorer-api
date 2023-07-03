@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
-// const cors = require('cors');
+const cors = require('cors');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(requestLogger);
 app.use(helmet());
 app.use(rateLimiter);
-app.use(corsOrigins);
+app.use(cors(corsOrigins));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
