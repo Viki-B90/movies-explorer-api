@@ -25,7 +25,7 @@
 //   return next();
 // }
 
-const corsOrigins = {
+const allowedCors = {
   origin: [
     'https://api.movies.viki.b.nomoredomains.rocks',
     'http://api.movies.viki.b.nomoredomains.rocks',
@@ -35,7 +35,11 @@ const corsOrigins = {
     'http://localhost:3000',
     'http://locahost:3001',
   ],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
   credentials: true,
 };
 
-module.exports = corsOrigins;
+module.exports = allowedCors;

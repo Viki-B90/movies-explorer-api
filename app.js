@@ -12,7 +12,7 @@ const { movieRoutes } = require('./routes/movies');
 const { signRoutes } = require('./routes/sign');
 const { auth } = require('./middlewares/auth');
 const { handleErrors } = require('./middlewares/handleErrors');
-const corsOrigins = require('./utils/cors-origins');
+const allowedCors = require('./utils/cors-origins');
 const { NotFoundError } = require('./errors/index-errors');
 const messages = require('./utils/messages');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(requestLogger);
 app.use(helmet());
 app.use(rateLimiter);
-app.use(cors(corsOrigins));
+app.use(cors(allowedCors));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
