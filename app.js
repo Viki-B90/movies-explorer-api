@@ -10,6 +10,7 @@ const rateLimiter = require('./middlewares/rateLimit');
 const { userRoutes } = require('./routes/users');
 const { movieRoutes } = require('./routes/movies');
 const { signRoutes } = require('./routes/sign');
+const { signoutRoutes } = require('./routes/signout');
 const { auth } = require('./middlewares/auth');
 const { handleErrors } = require('./middlewares/handleErrors');
 const corsOrigins = require('./utils/cors-origins');
@@ -36,6 +37,7 @@ app.use('/', signRoutes);
 
 app.use(auth);
 
+app.use('/', signoutRoutes);
 app.use('/', userRoutes);
 app.use('/', movieRoutes);
 

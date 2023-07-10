@@ -63,7 +63,13 @@ exports.login = (req, res, next) => {
 };
 
 exports.logout = (req, res) => {
-  res.clearCookie('jwt').send({ message: messages.successMessages.logoutSuccess });
+  res
+    .clearCookie('jwt', {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    })
+    .send({ message: messages.successMessages.logoutSuccess });
 };
 
 exports.getUser = (req, res, next) => {
